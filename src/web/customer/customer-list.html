@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer List</title>
+
+  <!-- Bootstrap CSSの読み込み -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  />
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">Customer List</h1>
+
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">会社名</th>
+          <th scope="col">業種</th>
+          <th scope="col">連絡先</th>
+          <th scope="col">所在地</th>
+        </tr>
+      </thead>
+
+      <tbody id="customer-list">
+        <!-- 顧客データはここに挿入されます -->
+      </tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    import config from "../config.js";
+
+    const customerList = document.getElementById("customer-list");
+
+    fetch(`${config.apiUrl}/customers`)
+      .then((response) => response.json())
+      .then((customers) => {
+        console.log(customers);
+        customers.forEach((customer) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>
+              <a href="detail.html?id=${customer.customer_id}">
+                ${customer.company_name}
+              </a>
+            </td>
+            <td>${customer.industry}</td>
+            <td>${customer.contact}</td>
+            <td>${customer.location}</td>
+          `;
+
+          customerList.appendChild(row);
+        });
+      })
+      .catch((error) => {
+        console.error("顧客一覧の取得に失敗しました:", error);
+      });
+  </script>
+
+  <!-- BootstrapのJavaScriptの読み込み -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

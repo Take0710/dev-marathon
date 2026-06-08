@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,87 @@
     <!-- Bootstrap CSSの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
+
 <body>
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+        <h2 class="mb-4">顧客情報確認</h2>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>会社名</th>
+                <td id="会社名"></td>
+            </tr>
+            <tr>
+                <th>業種</th>
+                <td id="業種"></td>
+            </tr>
+            <tr>
+                <th>連絡先</th>
+                <td id="連絡先"></td>
+            </tr>
+            <tr>
+                <th>所在地</th>
+                <td id="所在地"></td>
+            </tr>
+        </table>
+
+        <button id="back-button" class="btn btn-secondary">戻る</button>
+        <button id="register-button" class="btn btn-primary">登録</button>
+    </div>
     </div>
     <script type="module">
-        <!-- ここにJSを書く -->
+        import config from '../config.js';
+
+        const customer = JSON.parse(sessionStorage.getItem('updateCustomer'));
+
+        if (!customer) {
+            alert('入力情報がありません。');
+            window.location.href = './add.html'; window.location.href = '../customer-list.html';
+        } else {
+            document.getElementById('会社名').textContent = customer.companyName;
+            document.getElementById('業種').textContent = customer.industry;
+            document.getElementById('連絡先').textContent = customer.contact;
+            document.getElementById('所在地').textContent = customer.location;
+        }
+
+        document.getElementById('back-button').addEventListener('click', function () {
+            window.location.href = './update.html?id=' + customer.id;
+        });
+
+        document.getElementById('register-button').addEventListener('click', function () {
+            const formData = new URLSearchParams();
+
+            console.log("登録ボタン押下");
+            console.log(customer);
+
+            formData.append('companyName', customer.companyName);
+            formData.append('industry', customer.industry);
+            formData.append('contact', customer.contact);
+            formData.append('location', customer.location);
+
+            fetch(`${config.apiUrl}/customers/${customer.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('顧客情報が正常に保存されました。');
+                        sessionStorage.removeItem('customer');
+                        window.location.href = './list.html';
+                    } else {
+                        alert('保存に失敗しました。');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
     </script>
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
 </html>
